@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Tablets & Trials: The Covenant Quest - A biblical match-3 game following the journey of Moses and the Israelites">
+    <title>Tablets & Trials: The Covenant Quest</title>
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="assets/images/ui/favicon.png">
+    <meta name="theme-color" content="#1A365D">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/game-board.css">
+    <link rel="stylesheet" href="css/dialogue.css">
+    <link rel="stylesheet" href="css/journey-map.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="assets/fonts/Covenant-Regular.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+<body>
+    <!-- Game Container -->
+    <div id="game-container">
+        <!-- Loading Screen -->
+        <div id="loading-container" class="active">
+            <div class="loading-content">
+                <img src="assets/images/ui/logo.png" alt="Tablets & Trials Logo" class="loading-logo">
+                <div class="loading-bar-container">
+                    <div id="loading-bar"></div>
+                </div>
+                <p id="loading-message">Loading the covenant journey...</p>
+            </div>
+        </div>
+        
+        <!-- Menu Container -->
+        <div id="menu-container">
+            <!-- Main Menu -->
+            <div id="main-menu" class="menu-screen">
+                <div class="logo-container">
+                    <img src="assets/images/ui/logo.png" alt="Tablets & Trials Logo">
+                </div>
+                <div class="menu-buttons">
+                    <button id="play-button" class="button button--primary">Play</button>
+                    <button id="journey-button" class="button">Journey Map</button>
+                    <button id="scriptures-button" class="button">Scriptures</button>
+                    <button id="settings-button" class="button">Settings</button>
+                </div>
+                <div class="scripture-quote">
+                    <p>"By faith they passed through the Red Sea as by dry land." - Hebrews 11:29</p>
+                </div>
+            </div>
+            
+            <!-- Settings Menu -->
+            <div id="settings-menu" class="menu-screen">
+                <h2>Settings</h2>
+                <div class="settings-container">
+                    <div class="setting-item">
+                        <label for="music-volume">Music Volume</label>
+                        <input type="range" id="music-volume" min="0" max="100" value="75">
+                    </div>
+                    <div class="setting-item">
+                        <label for="sfx-volume">Sound Effects</label>
+                        <input type="range" id="sfx-volume" min="0" max="100" value="85">
+                    </div>
+                    <div class="setting-item">
+                        <label for="dialogue-speed">Dialogue Speed</label>
+                        <select id="dialogue-speed">
+                            <option value="slow">Slow</option>
+                            <option value="normal" selected>Normal</option>
+                            <option value="fast">Fast</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="settings-back" class="button">Back</button>
+            </div>
+        </div>
+        
+        <!-- Game Board Screen -->
+        <div id="game-board-container">
+            <!-- Top Bar -->
+            <div id="top-bar">
+                <div id="level-info">
+                    <h2 id="level-title">Level 1: Bricks Without Straw</h2>
+                    <div id="level-objectives">Collect 30 clay tiles</div>
+                </div>
+                <div id="game-stats">
+                    <div id="score-container">
+                        <span>Score:</span>
+                        <span id="score">0</span>
+                    </div>
+                    <div id="moves-container">
+                        <span>Moves:</span>
+                        <span id="moves-left">30</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Faith Meter -->
+            <div id="faith-meter-container">
+                <div id="faith-meter-label">Faith Meter</div>
+                <div id="faith-meter">
+                    <div id="faith-meter-fill"></div>
+                </div>
+                <div id="faith-meter-value">0%</div>
+            </div>
+            
+            <!-- Canvas Layers -->
+            <div id="canvas-container">
+                <canvas id="background-canvas" class="game-canvas"></canvas>
+                <canvas id="board-canvas" class="game-canvas"></canvas>
+                <canvas id="ui-canvas" class="game-canvas"></canvas>
+                <canvas id="effects-canvas" class="game-canvas"></canvas>
+            </div>
+            
+            <!-- Game Controls -->
+            <div id="game-controls">
+                <button id="pause-button" class="icon-button">
+                    <img src="assets/images/ui/pause-icon.svg" alt="Pause">
+                </button>
+                <button id="hint-button" class="icon-button">
+                    <img src="assets/images/ui/hint-icon.svg" alt="Hint">
+                </button>
+                <button id="power-button" class="icon-button" disabled>
+                    <img src="assets/images/ui/power-icon.svg" alt="Divine Power">
+                </button>
+            </div>
+        </div>
+        
+        <!-- Dialogue Container -->
+        <div id="dialogue-container">
+            <div id="dialogue-portrait">
+                <img id="character-portrait" src="assets/images/characters/moses-normal.png" alt="Moses">
+            </div>
+            <div id="dialogue-content">
+                <div id="character-name">Moses</div>
+                <div id="dialogue-text">The Lord has seen your affliction. He has heard your groaning. The time of deliverance draws near.</div>
+                <div id="scripture-reference">Exodus 2:24-25</div>
+            </div>
+            <div id="dialogue-advance">
+                <img src="assets/images/ui/advance-icon.svg" alt="Tap to continue">
+            </div>
+        </div>
+        
+        <!-- Level Complete Screen -->
+        <div id="level-complete" class="overlay-screen">
+            <div class="overlay-content">
+                <h2>Level Complete!</h2>
+                <div class="stars-container">
+                    <div class="star active"></div>
+                    <div class="star active"></div>
+                    <div class="star"></div>
+                </div>
+                <div class="level-results">
+                    <div class="result-item">
+                        <span>Score:</span>
+                        <span id="final-score">8350</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Moves Left:</span>
+                        <span id="final-moves">5</span>
+                    </div>
+                </div>
+                <div class="scripture-unlocked">
+                    <h3>Scripture Unlocked</h3>
+                    <div class="scripture-scroll">
+                        <p id="unlocked-scripture">"The Lord said, 'I have indeed seen the misery of my people in Egypt. I have heard them crying out because of their slave drivers, and I am concerned about their suffering.'" - Exodus 3:7</p>
+                    </div>
+                </div>
+                <div class="level-complete-buttons">
+                    <button id="next-level" class="button button--primary">Next Level</button>
+                    <button id="replay-level" class="button">Replay</button>
+                    <button id="map-button" class="button">Journey Map</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Journey Map Screen -->
+        <div id="journey-map-screen" class="overlay-screen">
+            <h2>The Covenant Journey</h2>
+            <div id="journey-map">
+                <!-- Map content will be dynamically generated -->
+            </div>
+            <button id="journey-back" class="button">Back</button>
+        </div>
+    </div>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js').then(registration => {
+                    console.log('ServiceWorker registration successful');
+                }).catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script>
+    
+    <!-- Main Scripts -->
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>

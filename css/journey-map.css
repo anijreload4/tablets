@@ -1,0 +1,345 @@
+/**
+ * Tablets & Trials: The Covenant Quest
+ * Journey Map CSS
+ */
+
+/* Journey Map Container */
+#journey-map-screen {
+    text-align: center;
+}
+
+#journey-map-screen h2 {
+    color: white;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+#journey-map {
+    width: 100%;
+    max-width: 800px;
+    height: 70vh;
+    background-color: #F5F5DC; /* Parchment color */
+    background-image: url('../assets/images/journey-map/parchment-bg.jpg');
+    background-size: cover;
+    border: 3px solid #D4AF37; /* Covenant gold */
+    border-radius: 8px;
+    position: relative;
+    overflow: auto;
+    margin: 0 auto 1.5rem;
+}
+
+/* Map Path */
+.journey-path {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.journey-path-line {
+    stroke: #8B4513; /* Brown */
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 10, 5;
+    fill: none;
+}
+
+.journey-path-line.completed {
+    stroke: #228B22; /* Green */
+    stroke-dasharray: none;
+}
+
+/* Level Nodes */
+.level-node {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #696969; /* Stone gray */
+    border: 3px solid #1A365D; /* Scripture blue */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    z-index: 10;
+}
+
+.level-node:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.8); /* Covenant gold glow */
+}
+
+.level-node.locked {
+    background-color: #A9A9A9; /* Dark gray */
+    border-color: #696969; /* Stone gray */
+    cursor: not-allowed;
+}
+
+.level-node.current {
+    background-color: #1A365D; /* Scripture blue */
+    border-color: #D4AF37; /* Covenant gold */
+    animation: pulse 1.5s infinite alternate;
+}
+
+.level-node.completed {
+    background-color: #228B22; /* Green */
+    border-color: #4682B4; /* Water blue */
+}
+
+/* Level Node Number */
+.level-number {
+    font-size: 1.2rem;
+}
+
+/* Level Stars */
+.level-stars {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+}
+
+.level-star {
+    width: 15px;
+    height: 15px;
+    background-image: url('../assets/images/ui/star-empty.svg');
+    background-size: contain;
+    background-repeat: no-repeat;
+    margin: 0 2px;
+}
+
+.level-star.earned {
+    background-image: url('../assets/images/ui/star-filled.svg');
+}
+
+/* Level Name Tooltip */
+.level-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(26, 54, 93, 0.9); /* Scripture blue with transparency */
+    color: white;
+    padding: 0.5rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 20;
+}
+
+.level-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(26, 54, 93, 0.9) transparent transparent transparent;
+}
+
+.level-node:hover .level-tooltip {
+    opacity: 1;
+}
+
+/* Map Landmarks */
+.map-landmark {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.landmark-egypt {
+    background-image: url('../assets/images/journey-map/egypt.svg');
+}
+
+.landmark-red-sea {
+    background-image: url('../assets/images/journey-map/red-sea.svg');
+}
+
+.landmark-sinai {
+    background-image: url('../assets/images/journey-map/mount-sinai.svg');
+}
+
+.landmark-wilderness {
+    background-image: url('../assets/images/journey-map/wilderness.svg');
+}
+
+.landmark-promised-land {
+    background-image: url('../assets/images/journey-map/promised-land.svg');
+}
+
+/* Epoch Dividers */
+.epoch-divider {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-family: 'Covenant', serif;
+    font-size: 1.5rem;
+    color: #8B4513; /* Brown */
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+    pointer-events: none;
+}
+
+/* Scripture Collection Indicator */
+.scripture-collection {
+    position: fixed;
+    bottom: 1rem;
+    left: 1rem;
+    background-color: rgba(26, 54, 93, 0.8); /* Scripture blue with transparency */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    z-index: 30;
+}
+
+.scripture-count {
+    font-weight: bold;
+    color: #D4AF37; /* Covenant gold */
+}
+
+/* Level Detail Panel */
+.level-detail-panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    max-width: 400px;
+    background-color: #F5F5DC; /* Parchment color */
+    border: 3px solid #D4AF37; /* Covenant gold */
+    border-radius: 8px;
+    padding: 1rem;
+    z-index: 100;
+    display: none;
+}
+
+.level-detail-panel.active {
+    display: block;
+}
+
+.level-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #8B4513; /* Brown */
+    padding-bottom: 0.5rem;
+}
+
+.level-detail-title {
+    font-size: 1.2rem;
+    color: #1A365D; /* Scripture blue */
+    font-weight: bold;
+}
+
+.level-detail-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #1A365D; /* Scripture blue */
+}
+
+.level-detail-scripture {
+    font-style: italic;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    background-color: rgba(212, 175, 55, 0.1); /* Covenant gold with opacity */
+    border-radius: 4px;
+}
+
+.level-detail-objective {
+    margin-bottom: 1rem;
+}
+
+.level-detail-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Animations */
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+    100% { transform: scale(1.1); box-shadow: 0 0 15px rgba(212, 175, 55, 0.8); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #journey-map {
+        height: 60vh;
+    }
+    
+    .level-node {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .level-number {
+        font-size: 1rem;
+    }
+    
+    .level-stars {
+        top: -15px;
+    }
+    
+    .level-star {
+        width: 12px;
+        height: 12px;
+    }
+    
+    .map-landmark {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .epoch-divider {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #journey-map {
+        height: 50vh;
+    }
+    
+    .level-node {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .level-number {
+        font-size: 0.9rem;
+    }
+    
+    .level-tooltip {
+        font-size: 0.8rem;
+        padding: 0.3rem;
+    }
+    
+    .map-landmark {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .epoch-divider {
+        font-size: 1rem;
+    }
+}

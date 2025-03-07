@@ -1,0 +1,302 @@
+/**
+ * Tablets & Trials: The Covenant Quest
+ * Dialogue System CSS
+ */
+
+/* Dialogue Container */
+#dialogue-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: 18%;
+    max-height: 30%;
+    background-color: rgba(26, 54, 93, 0.9); /* Scripture blue with transparency */
+    border-top: 2px solid #D4AF37; /* Covenant gold */
+    color: white;
+    display: none;
+    padding: 1rem;
+    z-index: 50;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    transform: translateY(100%);
+    opacity: 0;
+}
+
+#dialogue-container.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* Character Portrait */
+#dialogue-portrait {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #D4AF37; /* Covenant gold */
+    flex-shrink: 0;
+    margin-right: 1rem;
+    position: relative;
+    background-color: #696969; /* Stone gray as fallback */
+}
+
+#dialogue-portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.3s ease;
+}
+
+/* Character Portrait Emotions */
+.emotion-normal #character-portrait {
+    filter: none;
+}
+
+.emotion-concerned #character-portrait {
+    filter: sepia(0.3) brightness(0.9);
+}
+
+.emotion-commanding #character-portrait {
+    filter: brightness(1.1) contrast(1.1);
+}
+
+.emotion-fearful #character-portrait {
+    filter: sepia(0.5) hue-rotate(-10deg) brightness(0.9);
+}
+
+.emotion-angry #character-portrait {
+    filter: hue-rotate(-10deg) saturate(1.5) contrast(1.2);
+}
+
+.emotion-joyful #character-portrait {
+    filter: brightness(1.2) saturate(1.2);
+}
+
+/* Character Indicator */
+.character-indicator {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background-color: #D4AF37; /* Covenant gold */
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #1A365D; /* Scripture blue */
+}
+
+/* Dialogue Content */
+#dialogue-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    max-height: 100%;
+    padding-right: 0.5rem;
+}
+
+#character-name {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #D4AF37; /* Covenant gold */
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 2px black;
+}
+
+#dialogue-text {
+    line-height: 1.6;
+    margin-bottom: 0.75rem;
+    /* For typewriter effect */
+    white-space: pre-wrap;
+}
+
+#scripture-reference {
+    font-style: italic;
+    font-size: 0.9rem;
+    color: #D4AF37; /* Covenant gold */
+    align-self: flex-end;
+    margin-top: auto;
+    background-color: rgba(0, 0, 0, 0.3);
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    max-width: fit-content;
+}
+
+/* Dialogue Advance Indicator */
+#dialogue-advance {
+    width: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 0.5rem;
+}
+
+#dialogue-advance img {
+    width: 24px;
+    height: 24px;
+    animation: bounce 1s infinite alternate;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+#dialogue-advance img:hover {
+    opacity: 1;
+}
+
+/* Animation when dialogue appears */
+.dialogue-enter {
+    animation: dialogue-enter 0.5s forwards;
+}
+
+/* Animation when dialogue disappears */
+.dialogue-exit {
+    animation: dialogue-exit 0.5s forwards;
+}
+
+/* Character Transition */
+.character-transition {
+    animation: character-transition 0.3s forwards;
+}
+
+/* Scripture Highlight */
+.scripture-highlight {
+    background-color: rgba(212, 175, 55, 0.2); /* Covenant gold with opacity */
+    border-radius: 4px;
+    padding: 0 4px;
+    transition: background-color 0.3s ease;
+}
+
+.scripture-highlight:hover {
+    background-color: rgba(212, 175, 55, 0.4);
+}
+
+/* Dialogue Speed Settings */
+.dialogue-speed-slow #dialogue-text {
+    transition: max-height 1s ease-in-out;
+}
+
+.dialogue-speed-normal #dialogue-text {
+    transition: max-height 0.5s ease-in-out;
+}
+
+.dialogue-speed-fast #dialogue-text {
+    transition: max-height 0.2s ease-in-out;
+}
+
+/* Dialogue Choices (for future implementation) */
+.dialogue-choices {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.dialogue-choice {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 4px;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.dialogue-choice:hover {
+    background-color: rgba(212, 175, 55, 0.2);
+}
+
+/* Typewriter effect for text */
+.typewriter {
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 0;
+    display: inline-block;
+}
+
+/* Animations */
+@keyframes bounce {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-5px); }
+}
+
+@keyframes dialogue-enter {
+    0% { transform: translateY(100%); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes dialogue-exit {
+    0% { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(100%); opacity: 0; }
+}
+
+@keyframes character-transition {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0; transform: scale(0.9); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #dialogue-container {
+        min-height: 22%;
+        padding: 0.75rem;
+    }
+    
+    #dialogue-portrait {
+        width: 60px;
+        height: 60px;
+    }
+    
+    #character-name {
+        font-size: 1.1rem;
+    }
+    
+    .character-indicator {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #dialogue-container {
+        min-height: 30%;
+        padding: 0.5rem;
+    }
+    
+    #dialogue-portrait {
+        width: 50px;
+        height: 50px;
+        margin-right: 0.5rem;
+    }
+    
+    #character-name {
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    #dialogue-text {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+    
+    #scripture-reference {
+        font-size: 0.8rem;
+    }
+    
+    #dialogue-advance {
+        width: 30px;
+    }
+    
+    #dialogue-advance img {
+        width: 20px;
+        height: 20px;
+    }
+}
