@@ -1,0 +1,330 @@
+[
+  {
+    "id": "exodus-1-intro",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "levelStart",
+    "priority": 10,
+    "lines": [
+      {
+        "character": "EgyptianTaskmaster",
+        "text": "Pharaoh commands more bricks! And now, gather your own straw. The quota remains the same!",
+        "emotion": "stern",
+        "scriptureReference": "Exodus 5:7"
+      },
+      {
+        "character": "IsraeliteFather",
+        "text": "How can we make the same number of bricks when we must now gather straw ourselves? This burden is too great!",
+        "emotion": "suffering"
+      },
+      {
+        "character": "Moses",
+        "text": "I see your suffering. The cruelty of the Egyptians grows worse each day.",
+        "emotion": "concerned"
+      },
+      {
+        "character": "Aaron",
+        "text": "The people's strength fails them. Their spirits break under this hardship.",
+        "emotion": "supportive"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-brick-clearing",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "obstacleCleared",
+    "tileType": "brick",
+    "priority": 5,
+    "lines": [
+      {
+        "character": "IsraeliteFather",
+        "text": "My hands are raw from making bricks without proper straw. How much longer must we endure this?",
+        "emotion": "suffering"
+      },
+      {
+        "character": "Moses",
+        "text": "The Lord has seen your affliction. He has heard your groaning. The time of deliverance draws near.",
+        "emotion": "determined",
+        "scriptureReference": "Exodus 2:24-25"
+      },
+      {
+        "character": "IsraeliteChild",
+        "text": "Father, will we ever leave this place? Will we ever be free?",
+        "emotion": "afraid"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-match-stone",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "matchTiles",
+    "tileType": "stone",
+    "count": 5,
+    "priority": 3,
+    "repeatable": true,
+    "cooldown": 30000,
+    "lines": [
+      {
+        "character": "IsraeliteElder",
+        "text": "With each brick we make, our backs bend further under Pharaoh's yoke.",
+        "emotion": "worried"
+      },
+      {
+        "character": "Moses",
+        "text": "Take heart. The God of our fathers has not forgotten His promise.",
+        "emotion": "determined"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-staff-created",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "specialTileCreated",
+    "tileType": "staff",
+    "priority": 7,
+    "lines": [
+      {
+        "character": "Moses",
+        "text": "The Lord said to me, 'Take this staff in your hand so you can perform the signs with it.'",
+        "emotion": "commanding",
+        "scriptureReference": "Exodus 4:17"
+      },
+      {
+        "character": "Aaron",
+        "text": "With this staff, you have performed wonders before Pharaoh, yet his heart remains hardened.",
+        "emotion": "supportive"
+      },
+      {
+        "character": "IsraeliteFather",
+        "text": "Is this staff truly powerful enough to free us from bondage?",
+        "emotion": "normal"
+      },
+      {
+        "character": "Moses",
+        "text": "The power is not in the staff, but in the Lord who guides my hand.",
+        "emotion": "determined"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-faith-25",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "faithMeter",
+    "percentage": 25,
+    "priority": 4,
+    "lines": [
+      {
+        "character": "IsraeliteMother",
+        "text": "I'm beginning to believe that perhaps the God of our fathers has not forgotten us.",
+        "emotion": "hopeful"
+      },
+      {
+        "character": "Moses",
+        "text": "Faith is the seed from which deliverance will grow. Trust in the Lord and His promises.",
+        "emotion": "commanding"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-faith-50",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "faithMeter",
+    "percentage": 50,
+    "priority": 4,
+    "lines": [
+      {
+        "character": "Aaron",
+        "text": "The people's faith grows stronger. They begin to remember the promises made to Abraham, Isaac, and Jacob.",
+        "emotion": "supportive"
+      },
+      {
+        "character": "IsraeliteElder",
+        "text": "Four hundred years we have waited. Is this truly the time of deliverance our fathers were promised?",
+        "emotion": "hopeful",
+        "scriptureReference": "Genesis 15:13-14"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-faith-75",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "faithMeter",
+    "percentage": 75,
+    "priority": 4,
+    "lines": [
+      {
+        "character": "Miriam",
+        "text": "I can feel the Lord's presence growing stronger among us. His promises will soon be fulfilled.",
+        "emotion": "joyful"
+      },
+      {
+        "character": "IsraeliteChild",
+        "text": "Mother says we will journey to a land flowing with milk and honey. Is it true?",
+        "emotion": "curious"
+      },
+      {
+        "character": "Moses",
+        "text": "Yes, child. The Lord swore to bring us out of misery in Egypt into a good and spacious land.",
+        "emotion": "commanding",
+        "scriptureReference": "Exodus 3:8"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-faith-100",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "faithMeter",
+    "percentage": 100,
+    "priority": 6,
+    "lines": [
+      {
+        "character": "Moses",
+        "text": "The faith of our people is strong! Now the Lord will show His power to Pharaoh.",
+        "emotion": "commanding"
+      },
+      {
+        "character": "Aaron",
+        "text": "This is the same God who appeared to Abraham, Isaac, and Jacob. He will fulfill His covenant.",
+        "emotion": "supportive",
+        "scriptureReference": "Exodus 6:3-4"
+      },
+      {
+        "character": "IsraelitePeople",
+        "text": "Let the Lord, God of our fathers, deliver us with His mighty hand!",
+        "emotion": "celebrating"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-moves-10",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "movesLeft",
+    "moves": 10,
+    "priority": 5,
+    "lines": [
+      {
+        "character": "EgyptianTaskmaster",
+        "text": "Work faster! The day grows short and Pharaoh demands his bricks before sundown!",
+        "emotion": "stern"
+      },
+      {
+        "character": "IsraeliteFather",
+        "text": "We must hurry. The overseers will punish us if we fail to meet our quota.",
+        "emotion": "suffering"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-moves-5",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "movesLeft",
+    "moves": 5,
+    "priority": 6,
+    "lines": [
+      {
+        "character": "IsraeliteMother",
+        "text": "The sun is setting! We must finish our work quickly before the taskmasters return.",
+        "emotion": "fearful"
+      },
+      {
+        "character": "IsraeliteChild",
+        "text": "Father, I'm so tired... but I'll help gather more straw.",
+        "emotion": "afraid"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-objective-50",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "objectiveProgress",
+    "objectiveType": "collect",
+    "tileType": "stone",
+    "percentage": 50,
+    "priority": 4,
+    "lines": [
+      {
+        "character": "IsraeliteFather",
+        "text": "We're halfway to meeting our quota, but my strength is failing.",
+        "emotion": "suffering"
+      },
+      {
+        "character": "Moses",
+        "text": "Take courage, brother. Remember that the Lord has promised deliverance.",
+        "emotion": "determined"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-complete",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "levelComplete",
+    "priority": 10,
+    "lines": [
+      {
+        "character": "Moses",
+        "text": "I will speak to Pharaoh again. The Lord our God commands him to let our people go.",
+        "emotion": "determined",
+        "scriptureReference": "Exodus 5:1"
+      },
+      {
+        "character": "Aaron",
+        "text": "I will go with you, brother. The Lord has chosen me to be your voice.",
+        "emotion": "supportive",
+        "scriptureReference": "Exodus 4:14-16"
+      },
+      {
+        "character": "IsraeliteElder",
+        "text": "May the God of our fathers be with you as you stand before Pharaoh.",
+        "emotion": "hopeful"
+      },
+      {
+        "character": "Moses",
+        "text": "The Lord has heard your groaning. The time of deliverance draws near.",
+        "emotion": "commanding",
+        "scriptureReference": "Exodus 6:5-6"
+      }
+    ]
+  },
+  {
+    "id": "exodus-1-fail",
+    "level": 1,
+    "epoch": "exodus",
+    "triggerType": "levelFail",
+    "priority": 10,
+    "lines": [
+      {
+        "character": "EgyptianTaskmaster",
+        "text": "You have failed to meet your quota! Tomorrow your work will be doubled!",
+        "emotion": "stern"
+      },
+      {
+        "character": "IsraeliteFather",
+        "text": "We cannot bear this burden any longer. Where is this deliverance you promised, Moses?",
+        "emotion": "suffering",
+        "scriptureReference": "Exodus 5:21"
+      },
+      {
+        "character": "Moses",
+        "text": "O Lord, why have You brought trouble on this people? Why did You send me?",
+        "emotion": "concerned",
+        "scriptureReference": "Exodus 5:22-23"
+      },
+      {
+        "character": "Aaron",
+        "text": "Have faith, brother. The Lord's plan will unfold in its time.",
+        "emotion": "supportive"
+      }
+    ]
+  }
+]

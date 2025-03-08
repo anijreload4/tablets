@@ -6,6 +6,8 @@
 import ErrorHandler from './error-handler.js';
 import Debugging from '../utils/debugging.js';
 import PerformanceProfiler from '../utils/performance-profiler.js';
+// At the top of js/services/asset-cache.js, add:
+import FallbackAssets from './fallback-assets.js';
 
 // Asset Cache Module
 const AssetCache = (function() {

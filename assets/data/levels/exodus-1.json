@@ -1,0 +1,63 @@
+{
+    "id": "exodus-1",
+    "name": "Bricks Without Straw",
+    "epoch": "exodus",
+    "level": 1,
+    "description": "The Israelites struggle under Pharaoh's cruel command to make bricks without straw.",
+    "scripture": "\"The LORD said, 'I have indeed seen the misery of my people in Egypt. I have heard them crying out because of their slave drivers, and I am concerned about their suffering.'\" - Exodus 3:7",
+    "scriptureReference": "Exodus 5:6-7",
+    "objectives": [
+        {
+            "type": "collect",
+            "tileType": "stone",
+            "count": 20,
+            "description": "Collect 20 stone tiles"
+        },
+        {
+            "type": "score",
+            "target": 3000,
+            "description": "Score 3000 points"
+        }
+    ],
+    "moves": 25,
+    "boardSize": {
+        "width": 7,
+        "height": 7
+    },
+    "tileDistribution": {
+        "manna": 10,
+        "water": 15,
+        "fire": 10,
+        "stone": 40,
+        "quail": 15
+    },
+    "obstacles": [
+        {
+            "type": "brick",
+            "count": 5,
+            "positions": [
+                {"x": 1, "y": 1},
+                {"x": 3, "y": 2},
+                {"x": 5, "y": 3},
+                {"x": 2, "y": 4},
+                {"x": 4, "y": 5}
+            ]
+        }
+    ],
+    "specialTiles": [],
+    "specialMechanics": [],
+    "starRequirements": {
+        "1": 2000,
+        "2": 3500,
+        "3": 5000
+    },
+    "audio": {
+        "background": "exodus-theme",
+        "effects": {
+            "match": "default-match",
+            "special": "default-special",
+            "complete": "level-complete"
+        }
+    },
+    "backgroundImage": "assets/images/backgrounds/exodus-default.jpg"
+}

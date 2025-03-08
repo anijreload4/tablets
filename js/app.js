@@ -17,6 +17,132 @@ import Debugging from './utils/debugging.js';
 import PerformanceProfiler from './utils/performance-profiler.js';
 import NetworkManager from './services/network-manager.js';
 
+/**
+ * LOADING SCREEN BYPASS
+ * 
+ * Add this code at the very beginning of your js/app.js file
+ * This will bypass most initialization steps and force the game to show the main menu
+ */
+
+// Add this at the top of your app.js file (after imports)
+const BYPASS_LOADING = true; // Set to false to restore normal loading
+
+// Find the init function and modify it like this:
+function init() {
+    // BYPASS: Skip all loading and go straight to main menu
+    if (BYPASS_LOADING) {
+        console.log("⚠️ BYPASSING NORMAL LOADING SEQUENCE - DEVELOPMENT MODE ⚠️");
+        
+        // Hide loading screen immediately
+        const loadingContainer = document.getElementById('loading-container');
+        if (loadingContainer) {
+            loadingContainer.style.display = 'none';
+        }
+        
+        // Show menu container
+        const menuContainer = document.getElementById('menu-container');
+        if (menuContainer) {
+            menuContainer.classList.add('active');
+        }
+        
+        // Show main menu
+        const mainMenu = document.getElementById('main-menu');
+        if (mainMenu) {
+            mainMenu.classList.add('active');
+        }
+        
+        // Basic module initialization with dummy objects
+        window.audioManager = {
+            playMusic: () => {},
+            stopMusic: () => {},
+            pauseMusic: () => {},
+            resumeMusic: () => {},
+            playSfx: () => {},
+            setMusicVolume: () => {},
+            setSfxVolume: () => {},
+            toggleMusicMute: () => {},
+            toggleSfxMute: () => {},
+            preloadSounds: () => {}
+        };
+        
+        // Set up minimal event listeners for menu buttons
+        setupMinimalEventListeners();
+        
+        // Mark as initialized and return
+        isInitialized = true;
+        
+        return Promise.resolve();
+    }
+    
+    // Original initialization code continues here...
+    return new Promise((resolve, reject) => {
+        try {
+            // ... rest of your original init code
+        } catch (error) {
+            // ... rest of your original error handling
+        }
+    });
+}
+
+// Add this function for minimal functionality
+function setupMinimalEventListeners() {
+    // Main menu buttons
+    document.getElementById('play-button')?.addEventListener('click', () => {
+        console.log("Play button clicked - No game implementation in bypass mode");
+        alert("Game is in bypass mode. Implement custom handling for gameplay.");
+    });
+    
+    document.getElementById('journey-button')?.addEventListener('click', () => {
+        console.log("Journey button clicked - No implementation in bypass mode");
+        alert("Journey map not available in bypass mode");
+    });
+    
+    document.getElementById('settings-button')?.addEventListener('click', () => {
+        console.log("Settings button clicked");
+        const mainMenu = document.getElementById('main-menu');
+        const settingsMenu = document.getElementById('settings-menu');
+        
+        if (mainMenu && settingsMenu) {
+            mainMenu.classList.remove('active');
+            settingsMenu.classList.add('active');
+        }
+    });
+    
+    // Settings back button
+    document.getElementById('settings-back')?.addEventListener('click', () => {
+        console.log("Settings back button clicked");
+        const mainMenu = document.getElementById('main-menu');
+        const settingsMenu = document.getElementById('settings-menu');
+        
+        if (mainMenu && settingsMenu) {
+            settingsMenu.classList.remove('active');
+            mainMenu.classList.add('active');
+        }
+    });
+}
+
+// Also add this bypass to your DOMContentLoaded event
+document.addEventListener('DOMContentLoaded', () => {
+    if (BYPASS_LOADING) {
+        // Call our bypass init directly
+        init().then(() => {
+            console.log('Bypass initialization complete');
+        });
+    } else {
+        // Show loading screen and initialize normally
+        const loadingContainer = document.getElementById('loading-container');
+        if (loadingContainer) {
+            loadingContainer.classList.add('active');
+        }
+        
+        game.init().then(() => {
+            console.log('Game initialized successfully!');
+        }).catch(error => {
+            console.error('Game initialization failed:', error);
+        });
+    }
+});
+
 // Game configuration
 const gameConfig = {
     version: '1.0.0',
