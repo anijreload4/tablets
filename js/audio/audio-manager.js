@@ -189,27 +189,12 @@ function setupAudioUnlock() {
 // Call this function during initialization
 setupAudioUnlock();
 
-// Modify the init function to include the new features
+// Replace the entire init function in js/audio/audio-manager.js with this:
+
+// Initialize the audio manager
 function init(initialMusicVolume = 0.7, initialSfxVolume = 0.8) {
     try {
-        if (isInitialized) {
-            return {
-                playMusic,
-                stopMusic,
-                pauseMusic,
-                resumeMusic,
-                playSfx,
-                setMusicVolume,
-                setSfxVolume,
-                toggleMusicMute,
-                toggleSfxMute,
-                preloadSounds,
-                enableAudio,
-                isAudioEnabled: () => isAudioEnabled
-            };
-        }
-        
-        // Ensure values are valid numbers between 0 and 1
+        // First, ensure we have valid volume values
         musicVolume = Math.max(0, Math.min(1, Number(initialMusicVolume) || 0.7));
         sfxVolume = Math.max(0, Math.min(1, Number(initialSfxVolume) || 0.8));
         
@@ -221,20 +206,22 @@ function init(initialMusicVolume = 0.7, initialSfxVolume = 0.8) {
             
             // Add event listeners
             document.addEventListener('visibilitychange', handleVisibilityChange);
-            musicElement.addEventListener('error', handleMusicError);
+            if (musicElement) {
+                musicElement.addEventListener('error', handleMusicError);
+            }
             
             // Preload common sound effects
             preloadCommonSounds();
             
             // Set up audio unlock
             setupAudioUnlock();
+            
+            isInitialized = true;
+            console.log('Audio manager initialized');
         } catch (audioError) {
-            Debugging.warning('Audio element creation failed, using dummy audio', audioError);
+            console.warn('Audio element creation failed, using dummy audio', audioError);
             // Continue with limited functionality
         }
-        
-        isInitialized = true;
-        Debugging.info('Audio manager initialized');
         
         // Return the public API
         return {
@@ -252,26 +239,25 @@ function init(initialMusicVolume = 0.7, initialSfxVolume = 0.8) {
             isAudioEnabled: () => isAudioEnabled
         };
     } catch (error) {
-        Debugging.error('Failed to initialize audio manager', error);
+        console.error('Failed to initialize audio manager', error);
         
         // Return mock methods that do nothing to prevent errors
         return {
-            playMusic: function() {},
-            stopMusic: function() {},
-            pauseMusic: function() {},
-            resumeMusic: function() {},
-            playSfx: function() {},
-            setMusicVolume: function() {},
-            setSfxVolume: function() {},
-            toggleMusicMute: function() {},
-            toggleSfxMute: function() {},
-            preloadSounds: function() {},
-            enableAudio: function() {},
+            playMusic: () => {},
+            stopMusic: () => {},
+            pauseMusic: () => {},
+            resumeMusic: () => {},
+            playSfx: () => {},
+            setMusicVolume: () => {},
+            setSfxVolume: () => {},
+            toggleMusicMute: () => {},
+            toggleSfxMute: () => {},
+            preloadSounds: () => {},
+            enableAudio: () => {},
             isAudioEnabled: () => false
         };
     }
 }
-
     // Sound effect cache
     const sfxCache = {};
     
