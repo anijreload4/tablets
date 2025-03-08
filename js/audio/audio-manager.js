@@ -59,42 +59,13 @@ const AudioManager = (function() {
         'board-shuffle': 'assets/audio/sfx/board-shuffle.mp3'
     };
     
-    // Initialize the audio manager
-    function init(initialMusicVolume = 0.7, initialSfxVolume = 0.8) {
-        try {
-            if (isInitialized) {
-                return {
-                    playMusic,
-                    stopMusic,
-                    pauseMusic,
-                    resumeMusic,
-                    playSfx,
-                    setMusicVolume,
-                    setSfxVolume,
-                    toggleMusicMute,
-                    toggleSfxMute,
-                    preloadSounds
-                };
-            }
-            
-            // Create audio element for music
-            musicElement = new Audio();
-            musicElement.loop = true;
-            
-            // Set initial volumes
-            musicVolume = initialMusicVolume;
-            sfxVolume = initialSfxVolume;
-            
-            // Add event listeners
-            document.addEventListener('visibilitychange', handleVisibilityChange);
-            musicElement.addEventListener('error', handleMusicError);
-            
-            // Preload common sound effects
-            preloadCommonSounds();
-            
-            isInitialized = true;
-            Debugging.info('Audio manager initialized');
-            
+    // Fix for the init function in audio-manager.js
+// Replace the current init function with this:
+
+// Initialize the audio manager
+function init(initialMusicVolume = 0.7, initialSfxVolume = 0.8) {
+    try {
+        if (isInitialized) {
             return {
                 playMusic,
                 stopMusic,
@@ -107,24 +78,61 @@ const AudioManager = (function() {
                 toggleSfxMute,
                 preloadSounds
             };
-        } catch (error) {
-            Debugging.error('Failed to initialize audio manager', error);
-            
-            // Return mock methods that do nothing to prevent errors
-            return {
-                playMusic: () => {},
-                stopMusic: () => {},
-                pauseMusic: () => {},
-                resumeMusic: () => {},
-                playSfx: () => {},
-                setMusicVolume: () => {},
-                setSfxVolume: () => {},
-                toggleMusicMute: () => {},
-                toggleSfxMute: () => {},
-                preloadSounds: () => {}
-            };
         }
+        
+        // Ensure values are valid numbers between 0 and 1
+        musicVolume = Math.max(0, Math.min(1, initialMusicVolume || 0.7));
+        sfxVolume = Math.max(0, Math.min(1, initialSfxVolume || 0.8));
+        
+        // Create audio element for music
+        try {
+            musicElement = new Audio();
+            musicElement.loop = true;
+            
+            // Add event listeners
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            musicElement.addEventListener('error', handleMusicError);
+            
+            // Preload common sound effects
+            preloadCommonSounds();
+            
+            isInitialized = true;
+            console.log('Audio manager initialized');
+        } catch (audioError) {
+            console.warn('Audio element creation failed, using dummy audio', audioError);
+            // Continue with limited functionality
+        }
+        
+        return {
+            playMusic,
+            stopMusic,
+            pauseMusic,
+            resumeMusic,
+            playSfx,
+            setMusicVolume,
+            setSfxVolume,
+            toggleMusicMute,
+            toggleSfxMute,
+            preloadSounds
+        };
+    } catch (error) {
+        console.error('Failed to initialize audio manager', error);
+        
+        // Return mock methods that do nothing to prevent errors
+        return {
+            playMusic: () => {},
+            stopMusic: () => {},
+            pauseMusic: () => {},
+            resumeMusic: () => {},
+            playSfx: () => {},
+            setMusicVolume: () => {},
+            setSfxVolume: () => {},
+            toggleMusicMute: () => {},
+            toggleSfxMute: () => {},
+            preloadSounds: () => {}
+        };
     }
+}
     
     // Handle visibility change (pause/resume music)
     function handleVisibilityChange() {

@@ -168,14 +168,25 @@ const SaveManager = (function() {
         return { ...gameState };
     }
     
-    // Get settings
-    function getSettings() {
-        if (!settings) {
+    // Fix for the getSettings function in save-manager.js
+// Replace the current getSettings function with this:
+
+// Get settings
+function getSettings() {
+    if (!settings) {
+        try {
             loadSettings();
+        } catch (error) {
+            Debugging.error('Error loading settings, using defaults', error);
+            // Initialize with defaults if there's an error
+            settings = { ...DEFAULT_SETTINGS };
         }
-        
-        return { ...settings };
     }
+    
+    // Ensure we always return a complete settings object
+    // by merging with defaults in case any properties are missing
+    return { ...DEFAULT_SETTINGS, ...settings };
+}
     
     // Update settings
     function updateSettings(newSettings) {

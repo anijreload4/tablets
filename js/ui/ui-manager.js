@@ -300,13 +300,13 @@ const UIManager = (function() {
     
     // Show a specific screen
     function showScreen(screenId) {
-        // Hide current screen
+        // Hide current screen if active
         if (activeScreen) {
             hideScreen(activeScreen);
         }
         
         // Show new screen
-        let screenElement;
+        let screenElement = null;
         
         if (screenId === 'main-menu' || screenId === 'settings-menu') {
             // Menu screens
@@ -316,12 +316,15 @@ const UIManager = (function() {
             // Play menu music
             if (window.audioManager && window.audioManager.playMusic) {
                 window.audioManager.playMusic('menu-theme');
-        } else if (screenId === 'game-board') {
+            }
+        } 
+        else if (screenId === 'game-board') {
             // Game board screen
             screenElement = document.getElementById('game-board-container');
             
             // Music is handled by the level manager
-        } else if (screenId === 'journey-map') {
+        } 
+        else if (screenId === 'journey-map') {
             // Journey map screen
             screenElement = document.getElementById('journey-map-screen');
             
@@ -330,10 +333,12 @@ const UIManager = (function() {
             
             // Play map music
             AudioManager.playMusic('journey-map-theme');
-        } else if (screenId === 'level-complete') {
+        } 
+        else if (screenId === 'level-complete') {
             // Level complete screen
             screenElement = document.getElementById('level-complete');
-        } else {
+        } 
+        else {
             // Fallback to menu
             elements.menuContainer.classList.add('active');
             screenElement = document.getElementById('main-menu');
@@ -349,16 +354,19 @@ const UIManager = (function() {
     
     // Hide a specific screen
     function hideScreen(screenId) {
-        let screenElement;
+        let screenElement = null;
         
         if (screenId === 'main-menu' || screenId === 'settings-menu') {
             elements.menuContainer.classList.remove('active');
             screenElement = document.getElementById(screenId);
-        } else if (screenId === 'game-board') {
+        } 
+        else if (screenId === 'game-board') {
             screenElement = document.getElementById('game-board-container');
-        } else if (screenId === 'journey-map') {
+        } 
+        else if (screenId === 'journey-map') {
             screenElement = document.getElementById('journey-map-screen');
-        } else if (screenId === 'level-complete') {
+        } 
+        else if (screenId === 'level-complete') {
             screenElement = document.getElementById('level-complete');
         }
         
@@ -531,135 +539,122 @@ const UIManager = (function() {
         journeyMap.appendChild(scriptureCount);
     }
     
-// Create a level node on the journey map
-function createLevelNode(level, xPercent, yPercent, journeyMap, gameState) {
-    const levelNode = document.createElement('div');
-    levelNode.classList.add('level-node');
-    levelNode.dataset.levelId = level.id;
-    
-    // Check if level is unlocked
-    const isUnlocked = SaveManager.isLevelUnlocked(level.id);
-    if (!isUnlocked) {
-        levelNode.classList.add('locked');
-    }
-    
-    // Check if level is completed
-    const completionData = gameState.completedLevels[level.id];
-    if (completionData) {
-        levelNode.classList.add('completed');
-    }
-    
-    // Check if current level
-    if (level.id === gameState.currentLevel) {
-        levelNode.classList.add('current');
-    }
-    
-    // Set position
-    levelNode.style.left = `${xPercent}%`;
-    levelNode.style.top = `${yPercent}%`;
-    
-    // Add level number
-    const levelNumber = document.createElement('div');
-    levelNumber.classList.add('level-number');
-    levelNumber.textContent = level.id.split('-')[1];
-    levelNode.appendChild(levelNumber);
-    
-    // Add stars if completed
-    if (completionData) {
-        const starsContainer = document.createElement('div');
-        starsContainer.classList.add('level-stars');
+    // Create a level node on the journey map
+    function createLevelNode(level, xPercent, yPercent, journeyMap, gameState) {
+        const levelNode = document.createElement('div');
+        levelNode.classList.add('level-node');
+        levelNode.dataset.levelId = level.id;
         
-        for (let i = 1; i <= 3; i++) {
-            const star = document.createElement('div');
-            star.classList.add('level-star');
-            if (i <= completionData.stars) {
-                star.classList.add('earned');
-            }
-            starsContainer.appendChild(star);
+        // Check if level is unlocked
+        const isUnlocked = SaveManager.isLevelUnlocked(level.id);
+        if (!isUnlocked) {
+            levelNode.classList.add('locked');
         }
         
-        levelNode.appendChild(starsContainer);
-    }
-    
-    // Add tooltip with level name
-    const tooltip = document.createElement('div');
-    tooltip.classList.add('level-tooltip');
-    tooltip.textContent = level.name;
-    levelNode.appendChild(tooltip);
-    
-    // Add click handler for unlocked levels
-    if (isUnlocked) {
-        levelNode.addEventListener('click', () => {
-            // Play click sound
-            AudioManager.playSfx('button-click');
+        // Check if level is completed
+        const completionData = gameState.completedLevels[level.id];
+        if (completionData) {
+            levelNode.classList.add('completed');
+        }
+        
+        // Check if current level
+        if (level.id === gameState.currentLevel) {
+            levelNode.classList.add('current');
+        }
+        
+        // Set position
+        levelNode.style.left = `${xPercent}%`;
+        levelNode.style.top = `${yPercent}%`;
+        
+        // Add level number
+        const levelNumber = document.createElement('div');
+        levelNumber.classList.add('level-number');
+        levelNumber.textContent = level.id.split('-')[1];
+        levelNode.appendChild(levelNumber);
+        
+        // Add stars if completed
+        if (completionData) {
+            const starsContainer = document.createElement('div');
+            starsContainer.classList.add('level-stars');
             
-            // Show level detail panel
-            showLevelDetailPanel(level.id, journeyMap);
-        });
-    }
-    
-    journeyMap.appendChild(levelNode);
-}
-
-// Show level detail panel
-function showLevelDetailPanel(levelId, journeyMap) {
-    // Remove any existing panel
-    const existingPanel = document.querySelector('.level-detail-panel');
-    if (existingPanel) {
-        existingPanel.remove();
-    }
-    
-    // Get level metadata
-    const levelMetadata = LevelManager.getLevelMetadata(levelId);
-    const gameState = SaveManager.getGameState();
-    const completionData = gameState.completedLevels[levelId] || { stars: 0, score: 0 };
-    
-    // Create detail panel
-    const detailPanel = document.createElement('div');
-    detailPanel.classList.add('level-detail-panel');
-    
-    detailPanel.innerHTML = `
-        <div class="level-detail-header">
-            <div class="level-detail-title">${levelMetadata.name}</div>
-            <button class="level-detail-close">&times;</button>
-        </div>
-        <div class="level-detail-scripture">${levelMetadata.scriptureRef}</div>
-        <div class="level-detail-objective">
-            ${completionData.stars > 0 
-                ? `<p>Completed with ${completionData.stars} stars!</p>
-                   <p>High Score: ${completionData.score}</p>`
-                : '<p>Level not yet completed</p>'}
-        </div>
-        <div class="level-detail-buttons">
-            <button class="button button--primary" id="play-level-btn">Play Level</button>
-            ${completionData.stars > 0 
-                ? '<button class="button" id="replay-level-btn">Replay Level</button>'
-                : ''}
-        </div>
-    `;
-    
-    journeyMap.appendChild(detailPanel);
-    detailPanel.classList.add('active');
-    
-    // Add event listeners
-    detailPanel.querySelector('.level-detail-close').addEventListener('click', () => {
-        detailPanel.remove();
-    });
-    
-    detailPanel.querySelector('#play-level-btn').addEventListener('click', () => {
-        AudioManager.playSfx('button-click');
-        hideScreen('journey-map');
-        showLoadingScreen();
-        
-        // Start the level
-        if (window.game) {
-            window.game.loadLevel(levelId);
+            for (let i = 1; i <= 3; i++) {
+                const star = document.createElement('div');
+                star.classList.add('level-star');
+                if (i <= completionData.stars) {
+                    star.classList.add('earned');
+                }
+                starsContainer.appendChild(star);
+            }
+            
+            levelNode.appendChild(starsContainer);
         }
-    });
+        
+        // Add tooltip with level name
+        const tooltip = document.createElement('div');
+        tooltip.classList.add('level-tooltip');
+        tooltip.textContent = level.name;
+        levelNode.appendChild(tooltip);
+        
+        // Add click handler for unlocked levels
+        if (isUnlocked) {
+            levelNode.addEventListener('click', () => {
+                // Play click sound
+                AudioManager.playSfx('button-click');
+                
+                // Show level detail panel
+                showLevelDetailPanel(level.id, journeyMap);
+            });
+        }
+        
+        journeyMap.appendChild(levelNode);
+    }
     
-    const replayBtn = detailPanel.querySelector('#replay-level-btn');
-    if (replayBtn) {
-        replayBtn.addEventListener('click', () => {
+    // Show level detail panel
+    function showLevelDetailPanel(levelId, journeyMap) {
+        // Remove any existing panel
+        const existingPanel = document.querySelector('.level-detail-panel');
+        if (existingPanel) {
+            existingPanel.remove();
+        }
+        
+        // Get level metadata
+        const levelMetadata = LevelManager.getLevelMetadata(levelId);
+        const gameState = SaveManager.getGameState();
+        const completionData = gameState.completedLevels[levelId] || { stars: 0, score: 0 };
+        
+        // Create detail panel
+        const detailPanel = document.createElement('div');
+        detailPanel.classList.add('level-detail-panel');
+        
+        detailPanel.innerHTML = `
+            <div class="level-detail-header">
+                <div class="level-detail-title">${levelMetadata.name}</div>
+                <button class="level-detail-close">&times;</button>
+            </div>
+            <div class="level-detail-scripture">${levelMetadata.scriptureRef}</div>
+            <div class="level-detail-objective">
+                ${completionData.stars > 0 
+                    ? `<p>Completed with ${completionData.stars} stars!</p>
+                       <p>High Score: ${completionData.score}</p>`
+                    : '<p>Level not yet completed</p>'}
+            </div>
+            <div class="level-detail-buttons">
+                <button class="button button--primary" id="play-level-btn">Play Level</button>
+                ${completionData.stars > 0 
+                    ? '<button class="button" id="replay-level-btn">Replay Level</button>'
+                    : ''}
+            </div>
+        `;
+        
+        journeyMap.appendChild(detailPanel);
+        detailPanel.classList.add('active');
+        
+        // Add event listeners
+        detailPanel.querySelector('.level-detail-close').addEventListener('click', () => {
+            detailPanel.remove();
+        });
+        
+        detailPanel.querySelector('#play-level-btn').addEventListener('click', () => {
             AudioManager.playSfx('button-click');
             hideScreen('journey-map');
             showLoadingScreen();
@@ -669,59 +664,72 @@ function showLevelDetailPanel(levelId, journeyMap) {
                 window.game.loadLevel(levelId);
             }
         });
-    }
-}
-
-// Update path segments based on completed levels
-function updatePathSegments() {
-    const gameState = SaveManager.getGameState();
-    const completedLevels = gameState.completedLevels;
-    
-    // Get all level nodes
-    const levelNodes = document.querySelectorAll('.level-node');
-    const pathElement = document.querySelector('.journey-path-line');
-    
-    // If no path element, exit
-    if (!pathElement) return;
-    
-    // Get the total path length
-    const pathLength = pathElement.getTotalLength();
-    
-    // Calculate how much of the path should be "completed"
-    let completedNodeCount = 0;
-    
-    levelNodes.forEach(node => {
-        const levelId = node.dataset.levelId;
-        if (completedLevels[levelId]) {
-            completedNodeCount++;
+        
+        const replayBtn = detailPanel.querySelector('#replay-level-btn');
+        if (replayBtn) {
+            replayBtn.addEventListener('click', () => {
+                AudioManager.playSfx('button-click');
+                hideScreen('journey-map');
+                showLoadingScreen();
+                
+                // Start the level
+                if (window.game) {
+                    window.game.loadLevel(levelId);
+                }
+            });
         }
-    });
+    }
     
-    // If no levels completed, exit
-    if (completedNodeCount === 0) return;
+    // Update path segments based on completed levels
+    function updatePathSegments() {
+        const gameState = SaveManager.getGameState();
+        const completedLevels = gameState.completedLevels;
+        
+        // Get all level nodes
+        const levelNodes = document.querySelectorAll('.level-node');
+        const pathElement = document.querySelector('.journey-path-line');
+        
+        // If no path element, exit
+        if (!pathElement) return;
+        
+        // Get the total path length
+        const pathLength = pathElement.getTotalLength();
+        
+        // Calculate how much of the path should be "completed"
+        let completedNodeCount = 0;
+        
+        levelNodes.forEach(node => {
+            const levelId = node.dataset.levelId;
+            if (completedLevels[levelId]) {
+                completedNodeCount++;
+            }
+        });
+        
+        // If no levels completed, exit
+        if (completedNodeCount === 0) return;
+        
+        // Calculate percentage of path completed
+        const completedPercentage = completedNodeCount / levelNodes.length;
+        
+        // Create a completed path element
+        const completedPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        completedPath.classList.add('journey-path-line', 'completed');
+        
+        // Get the same path data
+        completedPath.setAttribute('d', pathElement.getAttribute('d'));
+        
+        // Set stroke-dasharray and stroke-dashoffset to show only completed portion
+        completedPath.style.strokeDasharray = pathLength;
+        completedPath.style.strokeDashoffset = pathLength * (1 - completedPercentage);
+        
+        // Add completed path before the original path
+        pathElement.parentNode.insertBefore(completedPath, pathElement);
+    }
     
-    // Calculate percentage of path completed
-    const completedPercentage = completedNodeCount / levelNodes.length;
-    
-    // Create a completed path element
-    const completedPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    completedPath.classList.add('journey-path-line', 'completed');
-    
-    // Get the same path data
-    completedPath.setAttribute('d', pathElement.getAttribute('d'));
-    
-    // Set stroke-dasharray and stroke-dashoffset to show only completed portion
-    completedPath.style.strokeDasharray = pathLength;
-    completedPath.style.strokeDashoffset = pathLength * (1 - completedPercentage);
-    
-    // Add completed path before the original path
-    pathElement.parentNode.insertBefore(completedPath, pathElement);
-}
-
-// Public API
-return {
-    init
-};
+    // Public API
+    return {
+        init
+    };
 })();
 
 export default UIManager;

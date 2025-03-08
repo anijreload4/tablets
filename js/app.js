@@ -90,53 +90,52 @@ const game = (function() {
                 // Initialize render manager
                 renderManager = RenderManager.init(canvasLayers);
                 
-                // Initialize audio system
+// Fix for audio manager initialization
+// Replace the problematic code around line 95 in app.js with this:
+
+// Initialize audio system
 updateLoadingProgress(15, 'Initializing audio system...');
 
-// Create default audio manager with fallback methods
-const defaultAudioManager = {
-    playMusic: function(track) { console.log('Mock playing music:', track); },
-    stopMusic: function() { console.log('Mock stopping music'); },
-    pauseMusic: function() { console.log('Mock pausing music'); },
-    resumeMusic: function() { console.log('Mock resuming music'); },
-    playSfx: function(sfx) { console.log('Mock playing sound effect:', sfx); },
-    setMusicVolume: function(vol) { console.log('Mock setting music volume:', vol); },
-    setSfxVolume: function(vol) { console.log('Mock setting sfx volume:', vol); }
-};
+// Default audio settings
+let musicVolume = 0.7; // Default value
+let sfxVolume = 0.8;   // Default value
 
 try {
-    // Safe way to get settings
-    let musicVolume = 0.7; // Default value
-    let sfxVolume = 0.8;   // Default value
-    
-    try {
-        const savedSettings = localStorage.getItem('tablets-trials-settings');
-        if (savedSettings) {
-            const parsedSettings = JSON.parse(savedSettings);
-            if (parsedSettings) {
-                musicVolume = (parsedSettings.musicVolume !== undefined) ? 
-                    parsedSettings.musicVolume / 100 : 0.7;
-                sfxVolume = (parsedSettings.sfxVolume !== undefined) ? 
-                    parsedSettings.sfxVolume / 100 : 0.8;
-            }
+    // Safely try to load settings
+    const savedSettings = SaveManager.getSettings();
+    if (savedSettings && typeof savedSettings === 'object') {
+        // Make sure we have valid numbers
+        if (typeof savedSettings.musicVolume === 'number' || 
+            typeof savedSettings.musicVolume === 'string') {
+            musicVolume = Number(savedSettings.musicVolume) / 100;
         }
-    } catch (e) {
-        console.warn('Failed to load audio settings, using defaults');
+        
+        if (typeof savedSettings.sfxVolume === 'number' || 
+            typeof savedSettings.sfxVolume === 'string') {
+            sfxVolume = Number(savedSettings.sfxVolume) / 100;
+        }
     }
-    
-    // Initialize AudioManager safely
-    const audioManager = AudioManager.init ?
-        AudioManager.init(musicVolume, sfxVolume) : defaultAudioManager;
-    
-    // Make audio manager available globally and on the game object
-    window.audioManager = audioManager;
-    
 } catch (error) {
-    console.error('Failed to initialize audio system:', error);
-    // Use fallback audio manager
-    window.audioManager = defaultAudioManager;
+    console.warn('Failed to load audio settings, using defaults:', error);
 }
 
+// Initialize AudioManager safely with defaults
+try {
+    const audioManager = AudioManager.init(musicVolume, sfxVolume);
+    window.audioManager = audioManager; // Make it globally available
+} catch (error) {
+    console.error('Failed to initialize audio system:', error);
+    // Create a dummy audio manager with empty methods
+    window.audioManager = {
+        playMusic: function() {},
+        stopMusic: function() {},
+        pauseMusic: function() {},
+        resumeMusic: function() {},
+        playSfx: function() {},
+        setMusicVolume: function() {},
+        setSfxVolume: function() {}
+    };
+}
 
 // Capture the returned object
 const audioManager = AudioManager.init(musicVolume, sfxVolume);
