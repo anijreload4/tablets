@@ -111,20 +111,43 @@ const ErrorHandler = (function() {
     }
     
     // Global error handler
-    window.addEventListener('error', (event) => {
-        const error = new GameError(
-            event.message || 'Unknown error',
-            'UNCAUGHT_ERROR',
-            {
-                filename: event.filename,
-                lineno: event.lineno,
-                colno: event.colno
-            }
-        );
-        
-        logError(error, SEVERITY.ERROR);
+    // In js/services/error-handler.js, around line 115
+// Find code that looks something like this:
+window.addEventListener('error', (event) => {
+    const error = new GameError(
+        event.message || 'Unknown error',
+        'UNCAUGHT_ERROR',
+        {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno
+        }
+    );
+    
+    logError(error, SEVERITY.ERROR);
+    event.preventDefault();
+});
+
+// And update it to something like this:
+window.addEventListener('error', (event) => {
+    // Check if event is valid before accessing properties
+    if (!event) return;
+    
+    const error = new GameError(
+        (event && event.message) || 'Unknown error',
+        'UNCAUGHT_ERROR',
+        {
+            filename: event && event.filename,
+            lineno: event && event.lineno,
+            colno: event && event.colno
+        }
+    );
+    
+    logError(error, SEVERITY.ERROR);
+    if (event) {
         event.preventDefault();
-    });
+    }
+});
     
     // Handle unhandled promise rejections
     window.addEventListener('unhandledrejection', (event) => {

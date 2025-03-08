@@ -7,7 +7,7 @@ import Debugging from '../utils/debugging.js';
 
 // Fallback Assets Module
 const FallbackAssets = (function() {
-    // Predefined placeholder assets
+    // Predefined placeholder assets as data URIs (works offline)
     const placeholders = {
         tile: {
             manna: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23F5F5DC" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12">Manna</text></svg>',
@@ -19,6 +19,22 @@ const FallbackAssets = (function() {
             pillar: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23FF8C00" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="10" fill="black">Pillar</text></svg>',
             tablets: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23DCDCDC" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="9" fill="black">Tablets</text></svg>',
             default: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23CCC" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12">Tile</text></svg>'
+        },
+        image: {
+            'dialogue-bg': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="500" height="150" viewBox="0 0 500 150"><rect width="500" height="150" fill="%231A365D" rx="10" ry="10"/><text x="250" y="80" text-anchor="middle" font-family="Arial" font-size="16" fill="white">Dialogue Background</text></svg>',
+            'moses-normal': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="%23DEB887" stroke="%23000" stroke-width="2"/><text x="64" y="70" text-anchor="middle" font-family="Arial" font-size="16">Moses</text></svg>',
+            'moses-concerned': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="%23DEB887" stroke="%23000" stroke-width="2"/><text x="64" y="70" text-anchor="middle" font-family="Arial" font-size="16">Moses</text></svg>',
+            'moses-commanding': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="%23DEB887" stroke="%23000" stroke-width="2"/><text x="64" y="70" text-anchor="middle" font-family="Arial" font-size="16">Moses</text></svg>',
+            'aaron-normal': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="%23DEB887" stroke="%23000" stroke-width="2"/><text x="64" y="70" text-anchor="middle" font-family="Arial" font-size="16">Aaron</text></svg>',
+            'logo': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200"><rect width="400" height="200" fill="%231A365D" rx="10" ry="10"/><text x="200" y="100" text-anchor="middle" font-family="Arial" font-size="24" fill="white">Tablets & Trials</text></svg>',
+            'button-bg': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="50" viewBox="0 0 200 50"><rect width="200" height="50" fill="%23696969" rx="5" ry="5"/></svg>',
+            'fallback-image': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23CCCCCC"/><text x="100" y="100" text-anchor="middle" font-family="Arial" font-size="16">Image Not Found</text></svg>',
+            'tile-manna': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23F5F5DC" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12">Manna</text></svg>',
+            'tile-water': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%234682B4" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12" fill="white">Water</text></svg>',
+            'tile-fire': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23C41E3A" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12" fill="white">Fire</text></svg>',
+            'tile-stone': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%23696969" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12" fill="white">Stone</text></svg>',
+            'tile-quail': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><circle cx="32" cy="32" r="24" fill="%238B4513" stroke="%23000" stroke-width="2"/><text x="32" y="37" text-anchor="middle" font-family="Arial" font-size="12" fill="white">Quail</text></svg>',
+            default: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" fill="%23CCCCCC"/><text x="100" y="100" text-anchor="middle" font-family="Arial" font-size="16">Image Not Found</text></svg>'
         },
         character: {
             moses: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><circle cx="64" cy="64" r="60" fill="%23DEB887" stroke="%23000" stroke-width="2"/><text x="64" y="70" text-anchor="middle" font-family="Arial" font-size="16">Moses</text></svg>',
@@ -33,10 +49,23 @@ const FallbackAssets = (function() {
         background: {
             exodus: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23F5F5DC"/><text x="400" y="300" text-anchor="middle" font-family="Arial" font-size="30">Exodus Background</text></svg>',
             wilderness: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23ECD9B8"/><text x="400" y="300" text-anchor="middle" font-family="Arial" font-size="30">Wilderness Background</text></svg>',
+            'menu-bg': 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%231A365D"/><text x="400" y="300" text-anchor="middle" font-family="Arial" font-size="30" fill="white">Menu Background</text></svg>',
             default: 'data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="%23F5F5DC"/><text x="400" y="300" text-anchor="middle" font-family="Arial" font-size="30">Background</text></svg>'
         },
         audio: {
-            silent: 'data:audio/mpeg;base64,SUQzAwAAAAIATElTVAAAAA=='
+            // Tiny silent audio data URI - works in all browsers
+            silent: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'menu-theme': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'button-click': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'dialogue-appear': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'dialogue-advance': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'match-three': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'tile-select': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'tile-swap': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'exodus-theme': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'wilderness-theme': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=',
+            'journey-map-theme': 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=', 
+            default: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA='
         }
     };
     
@@ -52,48 +81,35 @@ const FallbackAssets = (function() {
     
     // Generate background placeholder
     function generateBackgroundPlaceholder(color = '#F5F5DC', label = 'Background') {
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 600;
-        const ctx = canvas.getContext('2d');
-        
-        // Fill background
-        ctx.fillStyle = color;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Add grid pattern
-        ctx.strokeStyle = 'rgba(0,0,0,0.1)';
-        ctx.lineWidth = 1;
-        
-        for (let x = 0; x < canvas.width; x += 50) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, canvas.height);
-            ctx.stroke();
-        }
-        
-        for (let y = 0; y < canvas.height; y += 50) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(canvas.width, y);
-            ctx.stroke();
-        }
-        
-        // Add label
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        ctx.font = 'bold 30px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(`${label} Placeholder`, canvas.width / 2, canvas.height / 2);
-        
-        return canvas.toDataURL('image/jpeg', 0.5); // Low quality to reduce size
+        return `data:image/svg+xml;charset=utf-8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><rect width="800" height="600" fill="${encodeURIComponent(color)}"/><text x="400" y="300" text-anchor="middle" font-family="Arial" font-size="30">${encodeURIComponent(label)}</text></svg>`;
     }
     
     // Get fallback asset
     function getFallback(type, key) {
-        // Check if we have this specific fallback
+        // Special case handling
+        if (type === 'image' && key && key.startsWith('tile-')) {
+            // Handle tile images
+            const tileType = key.replace('tile-', '');
+            if (placeholders.tile[tileType]) {
+                return placeholders.tile[tileType];
+            }
+        }
+        
+        // Try to match by specific key
         if (placeholders[type] && placeholders[type][key]) {
             return placeholders[type][key];
+        }
+        
+        // Try to find a partial match for character portraits
+        if (type === 'image' && key) {
+            // Check if it's a character portrait (e.g., moses-normal)
+            const keyParts = key.split('-');
+            if (keyParts.length > 1) {
+                const characterName = keyParts[0];
+                if (placeholders.character[characterName]) {
+                    return placeholders.character[characterName];
+                }
+            }
         }
         
         // Return default for this type
@@ -105,6 +121,8 @@ const FallbackAssets = (function() {
         switch (type) {
             case 'tile':
                 return generateSVGPlaceholder('Tile', '#CCCCCC');
+            case 'image':
+                return placeholders.image.default;
             case 'character':
                 return generateCharacterPlaceholder('Character');
             case 'background':
@@ -119,7 +137,7 @@ const FallbackAssets = (function() {
     
     // Create a complete fallback for level assets
     function createLevelFallbacks(levelId) {
-        const levelMatch = levelId.match(/([a-z]+)_(\d+)/);
+        const levelMatch = levelId.match(/([a-z]+)-(\d+)/);
         const epoch = levelMatch ? levelMatch[1] : 'default';
         const levelNum = levelMatch ? parseInt(levelMatch[2]) : 0;
         
@@ -139,7 +157,7 @@ const FallbackAssets = (function() {
                 id: levelId,
                 name: `Level ${levelNum}: ${epoch.charAt(0).toUpperCase() + epoch.slice(1)}`,
                 objectives: [
-                    { type: 'score', target: 1000 }
+                    { type: 'score', target: 1000, description: "Score 1000 points" }
                 ],
                 moves: 30,
                 tileDistribution: {
@@ -169,7 +187,10 @@ const FallbackAssets = (function() {
     return {
         getFallback,
         createLevelFallbacks,
-        loadFallbackLevel
+        loadFallbackLevel,
+        generateSVGPlaceholder,
+        generateCharacterPlaceholder,
+        generateBackgroundPlaceholder
     };
 })();
 

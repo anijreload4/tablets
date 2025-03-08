@@ -121,56 +121,235 @@ const AssetCache = (function() {
         });
     }
     
-    // Load an image asset
-    function loadImage(id, src, priority = 1) {
-        return new Promise((resolve, reject) => {
-            // Skip if already loaded
-            if (assets.images[id]) {
-                // Update usage counter
-                updateAssetUsage(id, 'images', priority);
-                resolve(assets.images[id]);
+    // Modify loadImage function in asset-cache.js
+
+function loadImage(id, src, priority = 1) {
+    return new Promise((resolve, reject) => {
+        // Skip if already loaded
+        if (assets.images[id]) {
+            // Update usage counter
+            updateAssetUsage(id, 'images', priority);
+            resolve(assets.images[id]);
+            return;
+        }
+        
+        // Check if src exists - important for error handling
+        if (!src) {
+            const error = ErrorHandler.assetLoadError(id, 'image', { src: 'missing' });
+            Debugging.warning(`Missing source for image: ${id}`);
+            
+            // Create a placeholder image instead of failing
+            const fallbackSrc = FallbackAssets.getFallback('image', id);
+            if (fallbackSrc) {
+                Debugging.info(`Using fallback for ${id}`);
+                // Try loading the fallback instead
+                const fallbackImg = new Image();
+                fallbackImg.onload = () => {
+                    assets.images[id] = fallbackImg;
+                    updateAssetUsage(id, 'images', priority);
+                    resolve(fallbackImg);
+                };
+                fallbackImg.onerror = () => {
+                    reject(error); // If even fallback fails, reject
+                };
+                fallbackImg.src = fallbackSrc;
                 return;
             }
             
-            // Start performance tracking
-            PerformanceProfiler.startMarker(`load_image_${id}`);
+            reject(error);
+            return;
+        }
+        
+        // Start performance tracking
+        PerformanceProfiler.startMarker(`load_image_${id}`);
+        
+        const img = new Image();
+        
+        img.onload = () => {
+            // Store in cache
+            assets.images[id] = img;
             
-            const img = new Image();
+            // Track usage
+            updateAssetUsage(id, 'images', priority);
             
-            img.onload = () => {
-                // Store in cache
-                assets.images[id] = img;
-                
-                // Track usage
-                updateAssetUsage(id, 'images', priority);
-                
-                // Estimate size for cache management
-                const estimatedSize = (img.width * img.height * 4) / (1024 * 1024); // Rough RGBA size in MB
-                cacheSize.images += estimatedSize;
-                
-                // Check if we need to free up cache space
-                if (cacheSize.images > CACHE_LIMITS.images) {
-                    cleanupCache('images');
-                }
-                
-                // End performance tracking
-                const loadTime = PerformanceProfiler.endMarker(`load_image_${id}`);
-                PerformanceProfiler.trackLoadTime('image', id, loadTime);
-                
-                resolve(img);
-            };
+            // Estimate size for cache management
+            const estimatedSize = (img.width * img.height * 4) / (1024 * 1024); // Rough RGBA size in MB
+            cacheSize.images += estimatedSize;
             
-            img.onerror = () => {
-                // End performance tracking
-                PerformanceProfiler.endMarker(`load_image_${id}`);
-                
-                const error = ErrorHandler.assetLoadError(id, 'image', { src });
-                reject(error);
-            };
+            // Check if we need to free up cache space
+            if (cacheSize.images > CACHE_LIMITS.images) {
+                cleanupCache('images');
+            }
             
-            img.src = src;
-        });
-    }
+            // End performance tracking
+            const loadTime = PerformanceProfiler.endMarker(`load_image_${id}`);
+            PerformanceProfiler.trackLoadTime('image', id, loadTime);
+            
+            resolve(img);
+        };
+        
+        img.onerror = () => {
+            // End performance tracking
+            PerformanceProfiler.endMarker(`load_image_${id}`);
+            
+            const error = ErrorHandler.assetLoadError(id, 'image', { src });
+            
+            // Try to load a fallback if available
+            const fallbackSrc = FallbackAssets.getFallback('image', id);
+            if (fallbackSrc && fallbackSrc !== src) {
+                Debugging.info(`Using fallback for ${id}`);
+                // Try loading the fallback instead
+                const fallbackImg = new Image();
+                fallbackImg.onload = () => {
+                    assets.images[id] = fallbackImg;
+                    updateAssetUsage(id, 'images', priority);
+                    resolve(fallbackImg);
+                };
+                fallbackImg.onerror = () => {
+                    reject(error); // If even fallback fails, reject
+                };
+                fallbackImg.src = fallbackSrc;
+                return;
+            }
+            
+            reject(error);
+        };
+        
+        img.src = src;
+    });
+}
+
+// Similar updates for loadAudio function
+function loadAudio(id, src, priority = 1) {
+    return new Promise((resolve, reject) => {
+        // Skip if already loaded
+        if (assets.audio[id]) {
+            // Update usage counter
+            updateAssetUsage(id, 'audio', priority);
+            resolve(assets.audio[id]);
+            return;
+        }
+        
+        // Check if src exists
+        if (!src) {
+            const error = ErrorHandler.assetLoadError(id, 'audio', { src: 'missing' });
+            Debugging.warning(`Missing source for audio: ${id}`);
+            
+            // Create a silent audio element instead of failing
+            const fallbackSrc = FallbackAssets.getFallback('audio', 'silent');
+            if (fallbackSrc) {
+                Debugging.info(`Using silent fallback for ${id}`);
+                const fallbackAudio = new Audio();
+                fallbackAudio.oncanplaythrough = () => {
+                    assets.audio[id] = fallbackAudio;
+                    updateAssetUsage(id, 'audio', priority);
+                    resolve(fallbackAudio);
+                    fallbackAudio.oncanplaythrough = null;
+                };
+                fallbackAudio.onerror = () => {
+                    reject(error);
+                };
+                fallbackAudio.src = fallbackSrc;
+                fallbackAudio.load();
+                return;
+            }
+            
+            reject(error);
+            return;
+        }
+        
+        // Start performance tracking
+        PerformanceProfiler.startMarker(`load_audio_${id}`);
+        
+        const audio = new Audio();
+        
+        // Add a timeout for audio loading (15 seconds max)
+        let loadTimeout = setTimeout(() => {
+            Debugging.warning(`Audio load timeout for ${id}`);
+            audio.oncanplaythrough = null;
+            
+            // Use a silent fallback
+            const fallbackSrc = FallbackAssets.getFallback('audio', 'silent');
+            if (fallbackSrc) {
+                Debugging.info(`Using silent fallback for ${id} after timeout`);
+                const fallbackAudio = new Audio();
+                fallbackAudio.src = fallbackSrc;
+                assets.audio[id] = fallbackAudio;
+                updateAssetUsage(id, 'audio', priority);
+                PerformanceProfiler.endMarker(`load_audio_${id}`);
+                resolve(fallbackAudio);
+                return;
+            }
+            
+            // If no fallback, create an empty audio element
+            const emptyAudio = new Audio();
+            assets.audio[id] = emptyAudio;
+            updateAssetUsage(id, 'audio', priority);
+            PerformanceProfiler.endMarker(`load_audio_${id}`);
+            resolve(emptyAudio);
+        }, 15000);
+        
+        audio.oncanplaythrough = () => {
+            // Clear timeout
+            clearTimeout(loadTimeout);
+            
+            // Store in cache
+            assets.audio[id] = audio;
+            
+            // Track usage
+            updateAssetUsage(id, 'audio', priority);
+            
+            // Estimate size for cache management (rough estimate based on duration)
+            let estimatedSize = 0.5; // Default 0.5MB if duration unavailable
+            if (audio.duration) {
+                // Rough estimate: 1MB per minute of audio at medium quality
+                estimatedSize = (audio.duration / 60) * 1;
+            }
+            cacheSize.audio += estimatedSize;
+            
+            // Check if we need to free up cache space
+            if (cacheSize.audio > CACHE_LIMITS.audio) {
+                cleanupCache('audio');
+            }
+            
+            // End performance tracking
+            const loadTime = PerformanceProfiler.endMarker(`load_audio_${id}`);
+            PerformanceProfiler.trackLoadTime('audio', id, loadTime);
+            
+            // Remove the event listener to prevent memory leaks
+            audio.oncanplaythrough = null;
+            
+            resolve(audio);
+        };
+        
+        audio.onerror = () => {
+            // Clear timeout
+            clearTimeout(loadTimeout);
+            
+            // End performance tracking
+            PerformanceProfiler.endMarker(`load_audio_${id}`);
+            
+            const error = ErrorHandler.assetLoadError(id, 'audio', { src });
+            
+            // Try to load a fallback
+            const fallbackSrc = FallbackAssets.getFallback('audio', 'silent');
+            if (fallbackSrc) {
+                Debugging.info(`Using silent fallback for ${id} after error`);
+                const fallbackAudio = new Audio();
+                fallbackAudio.src = fallbackSrc;
+                assets.audio[id] = fallbackAudio;
+                updateAssetUsage(id, 'audio', priority);
+                resolve(fallbackAudio);
+                return;
+            }
+            
+            reject(error);
+        };
+        
+        audio.src = src;
+        audio.load(); // Start loading the audio
+    });
+}
     
     // Load an audio asset
     function loadAudio(id, src, priority = 1) {

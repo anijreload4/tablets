@@ -17,6 +17,261 @@ const AudioManager = (function() {
     let musicElement = null;
     let isInitialized = false;
     
+    // Add this to your AudioManager.js file to handle browser autoplay policies
+
+// Add these variables at the top of your AudioManager module
+let isAudioEnabled = false;
+let pendingMusic = null;
+
+// Create a function to enable audio on user interaction
+function enableAudio() {
+    if (isAudioEnabled) return;
+    
+    isAudioEnabled = true;
+    
+    // Try to play a silent sound to unlock audio
+    try {
+        const silentSound = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=");
+        silentSound.play().then(() => {
+            Debugging.info('Audio enabled by user interaction');
+            
+            // Play any pending music
+            if (pendingMusic && !isMusicMuted) {
+                const trackToPlay = pendingMusic;
+                pendingMusic = null;
+                playMusic(trackToPlay);
+            }
+        }).catch(error => {
+            Debugging.warning('Failed to enable audio:', error);
+            isAudioEnabled = false;
+        });
+    } catch (error) {
+        Debugging.warning('Error enabling audio:', error);
+        isAudioEnabled = false;
+    }
+}
+
+// Modify your playMusic function
+function playMusic(trackName) {
+    // Skip if music is muted
+    if (isMusicMuted) return;
+    
+    try {
+        // Get track path
+        const trackPath = musicTracks[trackName];
+        if (!trackPath) {
+            Debugging.warning(`Music track not found: ${trackName}`);
+            return;
+        }
+        
+        // If the same track is already playing, don't restart
+        if (currentMusic === trackName && musicElement && !musicElement.paused) {
+            return;
+        }
+        
+        // If audio isn't enabled yet, store the track name for later
+        if (!isAudioEnabled) {
+            pendingMusic = trackName;
+            Debugging.info(`Music playback of ${trackName} queued until user interaction`);
+            return;
+        }
+        
+        // Stop current music
+        stopMusic();
+        
+        // Skip if we don't have a valid audio element
+        if (!musicElement) return;
+        
+        // Set new track
+        musicElement.src = trackPath;
+        musicElement.volume = musicVolume;
+        currentMusic = trackName;
+        
+        // Play the music
+        musicElement.play().catch(error => {
+            // If we get an autoplay error, queue the music for later
+            if (error.name === 'NotAllowedError') {
+                Debugging.info(`Music autoplay blocked: ${trackName} - will play after user interaction`);
+                isAudioEnabled = false;
+                pendingMusic = trackName;
+                return;
+            }
+            
+            Debugging.warning(`Failed to play music track: ${trackName}`, error);
+            
+            // Try to use alternative format
+            const alternativeTrack = getFallbackTrack(trackPath);
+            if (alternativeTrack) {
+                Debugging.info(`Trying alternative track format for ${trackName}`);
+                musicElement.src = alternativeTrack;
+                musicElement.play().catch(e => {
+                    if (e.name === 'NotAllowedError') {
+                        isAudioEnabled = false;
+                        pendingMusic = trackName;
+                        return;
+                    }
+                    Debugging.error('Failed to play alternative track format', e);
+                });
+            }
+        });
+    } catch (error) {
+        Debugging.error(`Error playing music track: ${trackName}`, error);
+    }
+}
+
+// Similar updates to playSfx function
+function playSfx(sfxName) {
+    // Skip if sound effects are muted
+    if (isSfxMuted) return;
+    
+    // If audio isn't enabled yet, don't try to play
+    if (!isAudioEnabled) {
+        return;
+    }
+    
+    try {
+        // Get from cache or load
+        let sfx = sfxCache[sfxName];
+        if (!sfx) {
+            sfx = preloadSfx(sfxName);
+            if (!sfx) return; // Failed to load
+        }
+        
+        // Clone the audio to allow multiple simultaneous plays
+        const sfxClone = sfx.cloneNode();
+        sfxClone.volume = sfxVolume;
+        
+        // Play the sound
+        sfxClone.play().catch(error => {
+            // If autoplay is blocked, try to enable audio
+            if (error.name === 'NotAllowedError') {
+                isAudioEnabled = false;
+                return;
+            }
+            
+            Debugging.warning(`Failed to play sound effect: ${sfxName}`, error);
+        });
+        
+        // Clean up when done
+        sfxClone.addEventListener('ended', () => {
+            sfxClone.remove();
+        });
+    } catch (error) {
+        Debugging.error(`Error playing sound effect: ${sfxName}`, error);
+    }
+}
+
+// Add event listeners to enable audio on user interaction
+function setupAudioUnlock() {
+    // These events should unlock audio on most browsers
+    const unlockEvents = ['click', 'touchstart', 'touchend', 'keydown', 'mousedown'];
+    
+    const unlockAudio = () => {
+        enableAudio();
+        
+        // Remove event listeners once audio is enabled
+        if (isAudioEnabled) {
+            unlockEvents.forEach(event => {
+                document.removeEventListener(event, unlockAudio);
+            });
+            Debugging.info('Audio unlocked - removed event listeners');
+        }
+    };
+    
+    // Add event listeners
+    unlockEvents.forEach(event => {
+        document.addEventListener(event, unlockAudio, { once: false });
+    });
+    
+    Debugging.info('Audio unlock listeners set up');
+}
+
+// Call this function during initialization
+setupAudioUnlock();
+
+// Modify the init function to include the new features
+function init(initialMusicVolume = 0.7, initialSfxVolume = 0.8) {
+    try {
+        if (isInitialized) {
+            return {
+                playMusic,
+                stopMusic,
+                pauseMusic,
+                resumeMusic,
+                playSfx,
+                setMusicVolume,
+                setSfxVolume,
+                toggleMusicMute,
+                toggleSfxMute,
+                preloadSounds,
+                enableAudio,
+                isAudioEnabled: () => isAudioEnabled
+            };
+        }
+        
+        // Ensure values are valid numbers between 0 and 1
+        musicVolume = Math.max(0, Math.min(1, Number(initialMusicVolume) || 0.7));
+        sfxVolume = Math.max(0, Math.min(1, Number(initialSfxVolume) || 0.8));
+        
+        // Create audio element for music
+        try {
+            musicElement = new Audio();
+            musicElement.loop = true;
+            musicElement.volume = musicVolume;
+            
+            // Add event listeners
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+            musicElement.addEventListener('error', handleMusicError);
+            
+            // Preload common sound effects
+            preloadCommonSounds();
+            
+            // Set up audio unlock
+            setupAudioUnlock();
+        } catch (audioError) {
+            Debugging.warning('Audio element creation failed, using dummy audio', audioError);
+            // Continue with limited functionality
+        }
+        
+        isInitialized = true;
+        Debugging.info('Audio manager initialized');
+        
+        // Return the public API
+        return {
+            playMusic,
+            stopMusic,
+            pauseMusic,
+            resumeMusic,
+            playSfx,
+            setMusicVolume,
+            setSfxVolume,
+            toggleMusicMute,
+            toggleSfxMute,
+            preloadSounds,
+            enableAudio,
+            isAudioEnabled: () => isAudioEnabled
+        };
+    } catch (error) {
+        Debugging.error('Failed to initialize audio manager', error);
+        
+        // Return mock methods that do nothing to prevent errors
+        return {
+            playMusic: function() {},
+            stopMusic: function() {},
+            pauseMusic: function() {},
+            resumeMusic: function() {},
+            playSfx: function() {},
+            setMusicVolume: function() {},
+            setSfxVolume: function() {},
+            toggleMusicMute: function() {},
+            toggleSfxMute: function() {},
+            preloadSounds: function() {},
+            enableAudio: function() {},
+            isAudioEnabled: () => false
+        };
+    }
+}
+
     // Sound effect cache
     const sfxCache = {};
     

@@ -3,9 +3,9 @@
  * Service Worker for Offline Functionality
  */
 
-const CACHE_NAME = 'tablets-trials-v1';
+const CACHE_NAME = 'tablets-trials-v2'; // Changed version to force cache refresh
 
-// Assets to cache on install
+// Assets to cache on install (exclude all audio and large files)
 const STATIC_CACHE_URLS = [
   '/',
   '/index.html',
@@ -16,8 +16,6 @@ const STATIC_CACHE_URLS = [
   '/css/journey-map.css',
   '/css/responsive.css',
   '/js/app.js',
-  
-  // Core module files
   '/js/utils/render-manager.js',
   '/js/services/asset-cache.js',
   '/js/services/save-manager.js',
@@ -28,32 +26,7 @@ const STATIC_CACHE_URLS = [
   '/js/game/level.js',
   '/js/game/match-engine.js',
   '/js/dialogue/dialogue-manager.js',
-  '/js/ui/ui-manager.js',
-  
-  // Essential assets
-  '/assets/fonts/Covenant-Regular.woff2',
-  '/assets/fonts/Covenant-Regular.woff',
-  '/assets/images/ui/logo.png',
-  '/assets/images/ui/button-bg.png',
-  '/assets/images/ui/star-empty.svg',
-  '/assets/images/ui/star-filled.svg',
-  '/assets/images/ui/favicon.png',
-  '/assets/images/backgrounds/menu-bg.jpg',
-  
-  // Tile assets
-  '/assets/images/tiles/manna.svg',
-  '/assets/images/tiles/water.svg',
-  '/assets/images/tiles/fire.svg',
-  '/assets/images/tiles/stone.svg',
-  '/assets/images/tiles/quail.svg',
-  
-  // Initial character portraits
-  '/assets/images/characters/moses-normal.png',
-  '/assets/images/characters/aaron-normal.png',
-  
-  // Audio files
-  '/assets/audio/sfx/button-click.mp3',
-  '/assets/audio/music/menu-theme.mp3'
+  '/js/ui/ui-manager.js'
 ];
 
 // Install event - cache static assets
@@ -70,12 +43,14 @@ self.addEventListener('install', event => {
       
       // Use individual fetch promises that won't fail the entire operation
       const cachePromises = STATIC_CACHE_URLS.map(url => {
-        return fetch(url)
+        // Add explicit no-cache to ensure we get fresh content
+        return fetch(new Request(url, { cache: 'no-cache' }))
           .then(response => {
-            if (response.ok) {
+            // Only cache successful, complete responses
+            if (response.ok && response.status === 200) {
               return cache.put(url, response);
             }
-            console.warn(`[Service Worker] Failed to cache: ${url}`);
+            console.warn(`[Service Worker] Failed to cache: ${url} - Status: ${response.status}`);
             return Promise.resolve(); // Continue despite error
           })
           .catch(error => {
@@ -129,16 +104,23 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+  // Skip audio files completely - don't try to cache them
+  if (event.request.url.match(/\.(mp3|ogg|wav)$/i)) {
+    return; // Let the browser handle audio files directly
+  }
+  
   // For HTML pages - network first, then cache
-  if (event.request.headers.get('accept').includes('text/html')) {
+  if (event.request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Cache the latest version
-          let responseClone = response.clone();
-          caches.open(CACHE_NAME).then(cache => {
-            cache.put(event.request, responseClone);
-          });
+          // Only cache complete responses with 200 status
+          if (response.ok && response.status === 200) {
+            let responseClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseClone);
+            });
+          }
           return response;
         })
         .catch(() => {
@@ -163,26 +145,32 @@ self.addEventListener('fetch', event => {
         // Otherwise fetch from network
         return fetch(event.request)
           .then(response => {
-            // Cache successful response
-            if (response.ok) {
-              let responseClone = response.clone();
-              caches.open(CACHE_NAME).then(cache => {
-                cache.put(event.request, responseClone);
-              });
+            // Skip caching if response is not complete (status 200)
+            if (!response.ok || response.status !== 200) {
+              return response;
             }
+            
+            // Don't cache large files and media
+            if (event.request.url.match(/\.(jpg|jpeg|png|gif|mp4|webm|mp3|ogg|wav)$/i)) {
+              return response;
+            }
+            
+            // Cache the response
+            let responseClone = response.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseClone);
+            });
+            
             return response;
           })
           .catch(error => {
             console.error('[Service Worker] Fetch error:', error);
             
-            // For image requests, return fallback image
-            if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg)$/)) {
-              return caches.match('/assets/images/ui/fallback-image.svg');
-            }
-            
-            // For JavaScript or CSS, return empty response to avoid errors
-            if (event.request.url.match(/\.(js|css)$/)) {
-              return new Response('', { status: 200, headers: { 'Content-Type': 'text/plain' } });
+            // For image requests, try to return a fallback image
+            if (event.request.url.match(/\.(jpg|jpeg|png|gif|svg)$/i)) {
+              return caches.match('/assets/images/ui/fallback-image.svg').then(fallbackResponse => {
+                return fallbackResponse || new Response('Image not found', { status: 404 });
+              });
             }
             
             // Otherwise just propagate the error
@@ -190,59 +178,4 @@ self.addEventListener('fetch', event => {
           });
       })
   );
-});
-
-// Background sync for saving game progress when offline
-self.addEventListener('sync', event => {
-  if (event.tag === 'sync-game-progress') {
-    event.waitUntil(
-      // Logic to send cached progress to server
-      fetch('/api/sync-progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          timestamp: new Date().toISOString(),
-          action: 'sync'
-        })
-      })
-    );
-  }
-});
-
-// Push notification handling
-self.addEventListener('push', event => {
-  if (!event.data) return;
-  
-  const notification = event.data.json();
-  
-  const title = notification.title || 'Tablets & Trials';
-  const options = {
-    body: notification.body || 'New content available!',
-    icon: notification.icon || '/assets/images/ui/icon-192.png',
-    badge: '/assets/images/ui/badge.png',
-    data: notification.data || {}
-  };
-  
-  event.waitUntil(
-    self.registration.showNotification(title, options)
-  );
-});
-
-// Notification click handling
-self.addEventListener('notificationclick', event => {
-  event.notification.close();
-  
-  // Navigate to specific page if included in notification data
-  if (event.notification.data && event.notification.data.url) {
-    event.waitUntil(
-      clients.openWindow(event.notification.data.url)
-    );
-  } else {
-    // Otherwise open the main app
-    event.waitUntil(
-      clients.openWindow('/')
-    );
-  }
 });
