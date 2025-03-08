@@ -23,7 +23,13 @@ const SaveManager = (function() {
         collectedScriptures: [],  // Array of scripture IDs
         faithPoints: 0,          // Total faith points earned
         lastPlayed: Date.now(),
-        version: '1.0.0'
+        version: '1.0.0',
+        settings: {             // Include settings directly in game state for backward compatibility
+            musicVolume: 70,
+            sfxVolume: 80,
+            dialogueSpeed: 'normal',
+            showHints: true
+        }
     };
     
     // Default settings
@@ -92,7 +98,20 @@ const SaveManager = (function() {
         try {
             const savedState = localStorage.getItem(SAVE_KEY);
             if (savedState) {
-                gameState = { ...DEFAULT_GAME_STATE, ...JSON.parse(savedState) };
+                // Parse saved state and merge with defaults to ensure all properties exist
+                const parsedState = JSON.parse(savedState);
+                gameState = { ...DEFAULT_GAME_STATE, ...parsedState };
+                
+                // Ensure settings exist
+                if (!gameState.settings) {
+                    gameState.settings = { ...DEFAULT_SETTINGS };
+                } else {
+                    // Make sure all setting properties exist
+                    gameState.settings = { ...DEFAULT_SETTINGS, ...gameState.settings };
+                }
+                
+                // Save merged state back to storage
+                saveGameState();
             } else {
                 gameState = { ...DEFAULT_GAME_STATE };
                 saveGameState();
@@ -109,6 +128,11 @@ const SaveManager = (function() {
         try {
             // Update last played timestamp
             gameState.lastPlayed = Date.now();
+            
+            // Ensure settings are included
+            if (!gameState.settings) {
+                gameState.settings = { ...DEFAULT_SETTINGS };
+            }
             
             localStorage.setItem(SAVE_KEY, JSON.stringify(gameState));
             return true;
@@ -135,6 +159,12 @@ const SaveManager = (function() {
             loadGameState();
         }
         
+        // Double-check that settings exist
+        if (!gameState.settings) {
+            gameState.settings = { ...DEFAULT_SETTINGS };
+            saveGameState();
+        }
+        
         return { ...gameState };
     }
     
@@ -151,6 +181,12 @@ const SaveManager = (function() {
     function updateSettings(newSettings) {
         settings = { ...settings, ...newSettings };
         saveSettings();
+        
+        // Also update settings in the game state for backward compatibility
+        if (gameState) {
+            gameState.settings = { ...settings };
+            saveGameState();
+        }
         
         return settings;
     }
@@ -219,7 +255,8 @@ const SaveManager = (function() {
     // Reset game progress
     function resetProgress() {
         // Keep settings but reset game state
-        gameState = { ...DEFAULT_GAME_STATE };
+        const currentSettings = gameState?.settings || settings || DEFAULT_SETTINGS;
+        gameState = { ...DEFAULT_GAME_STATE, settings: { ...currentSettings } };
         saveGameState();
         
         Debugging.info('Game progress reset');
@@ -259,6 +296,11 @@ const SaveManager = (function() {
             // Update game state and settings
             gameState = { ...DEFAULT_GAME_STATE, ...saveData.gameState };
             settings = { ...DEFAULT_SETTINGS, ...saveData.settings };
+            
+            // Ensure settings exist in gameState
+            if (!gameState.settings) {
+                gameState.settings = { ...settings };
+            }
             
             // Save to storage
             saveGameState();

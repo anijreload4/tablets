@@ -1,0 +1,33 @@
+{
+  "name": "tablets",
+  "version": "1.0.0",
+  "description": "A biblical match-3 game following the journey of Moses and the Israelites",
+  "main": "service-worker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server . -p 8080 -c-1 -o",
+    "download-fonts": "node download-fonts.js",
+    "setup": "npm install && npm run download-fonts && echo \"Project setup complete!\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anijreload4/tablets.git"
+  },
+  "keywords": [
+    "game",
+    "bible",
+    "match-3",
+    "moses",
+    "education"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anijreload4/tablets/issues"
+  },
+  "homepage": "https://github.com/anijreload4/tablets#readme",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "node-fetch": "^2.6.9"
+  }
+}

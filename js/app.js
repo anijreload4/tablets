@@ -91,9 +91,56 @@ const game = (function() {
                 renderManager = RenderManager.init(canvasLayers);
                 
                 // Initialize audio system
-                updateLoadingProgress(15, 'Initializing audio system...');
-                AudioManager.init(SaveManager.getGameState().settings.musicVolume, 
-                                  SaveManager.getGameState().settings.sfxVolume);
+updateLoadingProgress(15, 'Initializing audio system...');
+
+// Create default audio manager with fallback methods
+const defaultAudioManager = {
+    playMusic: function(track) { console.log('Mock playing music:', track); },
+    stopMusic: function() { console.log('Mock stopping music'); },
+    pauseMusic: function() { console.log('Mock pausing music'); },
+    resumeMusic: function() { console.log('Mock resuming music'); },
+    playSfx: function(sfx) { console.log('Mock playing sound effect:', sfx); },
+    setMusicVolume: function(vol) { console.log('Mock setting music volume:', vol); },
+    setSfxVolume: function(vol) { console.log('Mock setting sfx volume:', vol); }
+};
+
+try {
+    // Safe way to get settings
+    let musicVolume = 0.7; // Default value
+    let sfxVolume = 0.8;   // Default value
+    
+    try {
+        const savedSettings = localStorage.getItem('tablets-trials-settings');
+        if (savedSettings) {
+            const parsedSettings = JSON.parse(savedSettings);
+            if (parsedSettings) {
+                musicVolume = (parsedSettings.musicVolume !== undefined) ? 
+                    parsedSettings.musicVolume / 100 : 0.7;
+                sfxVolume = (parsedSettings.sfxVolume !== undefined) ? 
+                    parsedSettings.sfxVolume / 100 : 0.8;
+            }
+        }
+    } catch (e) {
+        console.warn('Failed to load audio settings, using defaults');
+    }
+    
+    // Initialize AudioManager safely
+    const audioManager = AudioManager.init ?
+        AudioManager.init(musicVolume, sfxVolume) : defaultAudioManager;
+    
+    // Make audio manager available globally and on the game object
+    window.audioManager = audioManager;
+    
+} catch (error) {
+    console.error('Failed to initialize audio system:', error);
+    // Use fallback audio manager
+    window.audioManager = defaultAudioManager;
+}
+
+
+// Capture the returned object
+const audioManager = AudioManager.init(musicVolume, sfxVolume);
+window.audioManager = audioManager; // Make it globally available
                 
                 // Initialize UI manager
                 updateLoadingProgress(25, 'Setting up user interface...');

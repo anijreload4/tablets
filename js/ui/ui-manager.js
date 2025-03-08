@@ -314,7 +314,8 @@ const UIManager = (function() {
             screenElement = document.getElementById(screenId);
             
             // Play menu music
-            AudioManager.playMusic('menu-theme');
+            if (window.audioManager && window.audioManager.playMusic) {
+                window.audioManager.playMusic('menu-theme');
         } else if (screenId === 'game-board') {
             // Game board screen
             screenElement = document.getElementById('game-board-container');

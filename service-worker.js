@@ -210,11 +210,31 @@ self.addEventListener('notificationclick', event => {
   }
 });(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('[Service Worker] Caching static files');
-        return cache.addAll(STATIC_CACHE_URLS);
-      })
-      .catch(error => {
-        console.error('[Service Worker] Cache failure:', error);
-      })
-  );
+  .then(cache => {
+    console.log('[Service Worker] Caching static files');
+    
+    // Use individual fetch promises that won't fail the entire operation
+    const cachePromises = STATIC_CACHE_URLS.map(url => {
+      return fetch(url)
+        .then(response => {
+          if (response.ok) {
+            return cache.put(url, response);
+          }
+          console.warn(`[Service Worker] Failed to cache: ${url}`);
+          return Promise.resolve(); // Continue despite error
+        })
+        .catch(error => {
+          console.warn(`[Service Worker] Failed to fetch: ${url}`, error);
+          return Promise.resolve(); // Continue despite error
+        });
+    });
+    
+    return Promise.allSettled(cachePromises)
+      .then(results => {
+        const successes = results.filter(r => r.status === 'fulfilled').length;
+        console.log(`[Service Worker] Cached ${successes} of ${STATIC_CACHE_URLS.length} files`);
+      });
+  })
+  .catch(error => {
+    console.error('[Service Worker] Cache setup failure:', error);
+  });

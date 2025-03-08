@@ -1,0 +1,37 @@
+
+/* Font Declarations */
+@font-face {
+    font-family: 'Covenant';
+    src: url('../assets/fonts/Covenant-Regular.woff2') format('woff2'),
+         url('../assets/fonts/Covenant-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Covenant';
+    src: url('../assets/fonts/Covenant-Bold.woff2') format('woff2'),
+         url('../assets/fonts/Covenant-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CovenantText';
+    src: url('../assets/fonts/CovenantText-Regular.woff2') format('woff2'),
+         url('../assets/fonts/CovenantText-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'CovenantText';
+    src: url('../assets/fonts/CovenantText-Bold.woff2') format('woff2'),
+         url('../assets/fonts/CovenantText-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
